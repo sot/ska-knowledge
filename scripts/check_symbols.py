@@ -122,13 +122,31 @@ def check_domain_facts():
         chk(f"format '{fmt}' registered", fmt in CxoTime.FORMATS)
 
     # coordinates-and-frames.md
+    # The pixels_to_yagzag signature changed in chandra_aca 4.55.0: t_aca 20 -> 35.0,
+    # allow_bad False -> True, and args became keyword-only. Assert BOTH regimes so the
+    # reference file's version table stays honest in whichever env this runs.
+    from packaging.version import Version
+
+    import chandra_aca
+
+    ver = Version(chandra_aca.__version__)
+    new_api = ver >= Version("4.55.0")
     sig = inspect.signature(tr.pixels_to_yagzag)
-    chk("pixels_to_yagzag t_aca default == 35.0",
-        sig.parameters["t_aca"].default == 35.0, str(sig.parameters["t_aca"].default))
+    want_t_aca = 35.0 if new_api else 20
+    want_allow_bad = new_api
+    want_kind = (
+        inspect.Parameter.KEYWORD_ONLY if new_api else inspect.Parameter.POSITIONAL_OR_KEYWORD
+    )
+    chk(f"chandra_aca {ver}: t_aca default == {want_t_aca}",
+        sig.parameters["t_aca"].default == want_t_aca, str(sig.parameters["t_aca"].default))
+    chk(f"chandra_aca {ver}: allow_bad default == {want_allow_bad}",
+        sig.parameters["allow_bad"].default == want_allow_bad,
+        str(sig.parameters["allow_bad"].default))
+    chk(f"chandra_aca {ver}: args keyword-only == {new_api}",
+        sig.parameters["pix_zero_loc"].kind is want_kind,
+        sig.parameters["pix_zero_loc"].kind.name)
     chk("pixels_to_yagzag pix_zero_loc default == 'edge'",
         sig.parameters["pix_zero_loc"].default == "edge")
-    chk("pix_zero_loc is keyword-only",
-        sig.parameters["pix_zero_loc"].kind is inspect.Parameter.KEYWORD_ONLY)
 
     y_e, z_e = tr.pixels_to_yagzag(100.0, 100.0, pix_zero_loc="edge")
     y_c, z_c = tr.pixels_to_yagzag(100.0, 100.0, pix_zero_loc="center")

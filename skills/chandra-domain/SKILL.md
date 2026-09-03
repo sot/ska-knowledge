@@ -25,7 +25,9 @@ the [ska router](../ska/SKILL.md).
    `1997:365:23:58:56.816`; `1998:001:00:00:00` UTC is `63.184` seconds.
 3. **`pix_zero_loc` defaults to `"edge"`** and switching to `"center"` moves you half a
    pixel, ≈ 2.49 arcsec.
-4. **`t_aca` defaults to 35.0 degC**, not room temperature, in the pixel transforms.
+4. **`t_aca`'s default changed** (20 → 35.0 degC in `chandra_aca` 4.55.0), as did
+   `allow_bad` (False → True) and whether the args are keyword-only. Pass `t_aca`
+   explicitly; never inherit it.
 
 ## Units cheat sheet
 

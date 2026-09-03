@@ -16,14 +16,20 @@ Verified against `chandra_aca` 4.56.0 / `Quaternion` 4.3.2 in `ska3-flight` 2026
 All in `chandra_aca.transform` — the one module `chandra_aca` re-exports at top level.
 
 ```python
+# chandra_aca >= 4.55.0
 pixels_to_yagzag(row, col, *, allow_bad=True, flight=False, t_aca=35.0, pix_zero_loc="edge")
 yagzag_to_pixels(yang, zang, *, allow_bad=True, flight=False, t_aca=35.0, pix_zero_loc="edge")
+
+# chandra_aca <= 4.53.0 -- different defaults, and NOT keyword-only
+pixels_to_yagzag(row, col, allow_bad=False, flight=False, t_aca=20, pix_zero_loc="edge")
+
 yagzag_to_radec(yag, zag, q_att)
 radec_to_yagzag(ra, dec, q_att)
 ```
 
-Note the `*`: everything after `row, col` is **keyword-only**. Passing `pix_zero_loc`
-positionally is a `TypeError`, not a silent misread.
+On 4.55.0+ the `*` makes everything after `row, col` **keyword-only**, so a positional
+`pix_zero_loc` is a `TypeError` rather than a silent misread. On older versions it is
+accepted positionally. See the `t_aca` section below — the defaults differ too.
 
 A full round trip is good to ~1e-4 pixel:
 
@@ -57,12 +63,32 @@ Half a pixel is small enough to pass a sanity check and large enough to ruin a c
 comparison. Decide which convention your row/col came from before calling. Centroids
 generally use `"center"`; raw telemetry row/col indices generally use the default.
 
-### `t_aca` — defaults to 35.0, not room temperature
+### `t_aca` — the default CHANGED, so never rely on it
 
 `t_aca` is the ACA CCD temperature in **degC** feeding the plate-scale / distortion
-correction, and it **defaults to 35.0**. It is a common mistake to assume ~20. If you care
-about arcsec-level accuracy, pass the actual temperature (`AACCCDPT`) rather than the
-default.
+correction. Its default changed in **chandra_aca 4.55.0** ("Add type annotations",
+2026-03-23), along with two other signature changes:
+
+| | ≤ 4.53.0 (e.g. `ska3-aca` 2026.11) | ≥ 4.55.0 (e.g. `ska3-flight` 2026.9) |
+|---|---|---|
+| `t_aca` default | **20** | **35.0** |
+| `allow_bad` default | **False** | **True** |
+| argument kind | positional-or-keyword | **keyword-only** after `row, col` |
+
+All three matter:
+
+- **`t_aca` 20 → 35** silently changes your answer at the arcsec level between
+  environments. **Always pass `t_aca` explicitly** (the actual `AACCCDPT`) if you care
+  about accuracy or reproducibility — do not inherit the default.
+- **`allow_bad` False → True** changes error behavior: the older version *raises* on
+  out-of-range pixels where the newer one lets them through. Code that relied on the
+  exception will silently stop raising.
+- **Keyword-only** means `pixels_to_yagzag(row, col, True)` works on 4.53.0 and is a
+  `TypeError` on 4.56.0.
+
+Check `chandra_aca.__version__` rather than assuming — and note that the *higher-numbered*
+environment can have the *older* package (see
+[ska-environment](../../ska-data-access/references/ska-environment.md)).
 
 `flight=False` by default selects the nominal distortion model; `flight=True` selects the
 flight model. Match whatever the rest of your analysis uses.
