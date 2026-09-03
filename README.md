@@ -44,19 +44,31 @@ Verify which content is actually live:
 diff -r ~/.claude/plugins/cache/sot/ska/*/skills ./skills
 ```
 
-### For a whole repo
+### For teammates
 
-Commit this to the repo's `.claude/settings.json` and everyone who clones gets it after
-the standard one-time folder-trust prompt, with no manual install:
+One-time, covers every repo and every directory:
 
-```json
-{
-  "extraKnownMarketplaces": {
-    "sot": { "source": { "source": "github", "repo": "sot/ska-knowledge" } }
-  },
-  "enabledPlugins": { "ska@sot": true }
-}
+```bash
+claude plugin marketplace add sot/ska-knowledge
+claude plugin install ska@sot
 ```
+
+Equivalently, inside a terminal `claude` session: `/plugin marketplace add
+sot/ska-knowledge` then `/plugin install ska@sot`. **`/plugin` does not exist in the VS
+Code extension** — use a terminal. If you have no `claude` on your PATH, the extension
+ships one:
+
+```bash
+$(find ~/.vscode/extensions -maxdepth 4 -path '*native-binary/claude' | sort | tail -1) plugin list
+```
+
+Then reload/restart so the skills load, and confirm by asking Claude "list your available
+skills" — you should see four `ska:*` entries.
+
+Installing at **user scope** (the default) is deliberate and is the recommended path. It
+covers bare analysis directories and notebooks, not just package repos — which is where a
+lot of Chandra work actually happens. A per-repo `.claude/settings.json` would cover
+neither, and would need maintaining across ~90 repos.
 
 ## Reading it as a human
 
