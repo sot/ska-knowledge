@@ -41,6 +41,12 @@ Choosing a source:
 | `"cxc"` | mica ACA L0 archive | Bulk/historical work, offline, reproducible. Needs the L0 archive on disk. |
 | `"cheta"` | cheta telemetry archive | You are already working in cheta and want consistency with other MSIDs. |
 
+**Version gate:** `source="cheta"` and `get_aca_images_cheta` were added in
+**chandra_aca 4.56.0** (2026-06-27). Older installs accept only `"maude"` and `"cxc"` and
+raise `ValueError` for `"cheta"`. Notably `ska3-aca` 2026.11 ships 4.53.0, so the cheta
+backend is **not** available there even though `ska3-flight` 2026.9 (4.56.0) has it —
+check `chandra_aca.__version__` rather than assuming.
+
 Call a backend directly only when you want its native behavior and columns — for example
 `chandra_aca.maude_decom.get_aca_images` for MAUDE-specific frame handling.
 

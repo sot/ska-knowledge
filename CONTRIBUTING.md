@@ -97,6 +97,33 @@ Other conventions:
 - Prefer a gotcha over a restatement of the docs. If the package docs say it clearly,
   link, do not copy.
 
+## Verify against the installed release, not the repo
+
+**The `~/git` checkouts are ahead of what is deployed.** Reading symbol names out of a repo
+at `master` and writing them down produces confidently wrong documentation. This has already
+happened twice:
+
+- `jobwatch` master defines `SkaJobWatch`/`SkaDbWatch`/`SkaWebWatch`, so a grep of the repo
+  suggested they live in `jobwatch.jobwatch`. In the installed 0.14.6 they are in
+  `jobwatch.skawatch` and `jobwatch.hourly_watch` — the *application* modules, one of which
+  cannot even be imported off HEAD. Only `JobWatch`/`FileWatch`/`DbWatch` are in the core.
+- `fss_check` master has `get_fss_prim_data`; installed 1.0.1 does not.
+
+**Also: environments disagree with each other.** `ska3-aca` 2026.11 ships `chandra_aca`
+4.53.0 while `ska3-flight` 2026.9 ships 4.56.0 — so `get_aca_images_cheta`, added in 4.56.0,
+is missing from the *higher-numbered* environment. A higher metapackage version does not mean
+newer packages inside.
+
+Consequences for writing entries here:
+
+1. Introspect the installed package (`dir()`, `inspect.signature`, `pkg.__version__`), do
+   not grep the repo.
+2. If a symbol is newer than the oldest environment people use, state the version gate
+   explicitly rather than presenting it as always available.
+3. Add every new claim to `scripts/check_symbols.py` and run it in **both** `ska3` and
+   `ska3-aca`. Version-gated claims go in `CLAIMS_VERSION_GATED`, which asserts presence
+   *and* absence against the installed version.
+
 ## Verifying
 
 Every symbol named in a routing table must exist in `ska3-flight`:

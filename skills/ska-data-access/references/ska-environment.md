@@ -100,6 +100,11 @@ successfully — often easier than maintaining a standalone install.
 
 ## Gotchas
 
+- **A higher metapackage version does not mean newer packages inside.** Verified
+  2026-09-03: `ska3-aca` 2026.11 ships `chandra_aca` 4.53.0 while `ska3-flight` 2026.9
+  ships 4.56.0 — so an API added in 4.56.0 is missing from the *newer-numbered*
+  environment. Always check `pkg.__version__` in the env you are actually running.
+
 - **Conda < 4.8 does not work.** Delete and reinstall rather than trying to upgrade.
 - **Import performance on HEAD/GRETA**: installing Ska3 on *local* disk is noticeably
   faster than the shared `/proj/sot` path.

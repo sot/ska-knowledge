@@ -16,6 +16,7 @@ API signatures — read those from `https://sot.github.io/<pkg>` or the installe
 | File | Covers |
 |---|---|
 | [chandra_aca.md](references/chandra_aca.md) | ACA images, transforms, star probabilities, drift |
+| [aca-monitors.md](references/aca-monitors.md) | The `ska3-aca` cron monitors as a family — jobwatch, fss_check, aca_hi_bgd, kalman_watch, attitude_error_mon, aca_weekly_report, ska_report_ranges |
 
 *Remaining reference files are being written — see the repo README for status. Until a
 package has a file here, use the router table plus the package's own docs.*

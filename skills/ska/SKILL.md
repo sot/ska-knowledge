@@ -136,6 +136,24 @@ cheta gives what was telemetered.
 | Get the fitted model spec for a thermal model | `xija.get_model_spec.get_xija_model_spec` |
 | Any file from the `chandra_models` repo, version-aware | `ska_helpers.chandra_models.get_data` |
 
+### Monitoring and trending (`ska3-aca` only)
+
+These are **applications, not libraries** — cron-driven monitors that write HTML reports.
+Run the console script; do not import them. Full detail and gotchas in
+[references/aca-monitors.md](../ska-packages/references/aca-monitors.md).
+
+| Task | Use |
+|---|---|
+| Are the Ska cron jobs healthy? | `jobwatch` → `skawatch_daily` / `skawatch_hourly` (HEAD-only) |
+| Fine Sun Sensor pitch/roll error trending | `fss_check` → `fss_check_daily_fss` |
+| ACA high-background events | `aca_hi_bgd` → `aca_hi_bgd_update` |
+| Kalman star health, perigee passages | `kalman_watch` → `kalman_watch_low_kalman_mon`, `..._kalman_perigee_mon`, `..._monitor_win_perigee` |
+| One-shot / attitude error trending | `attitude_error_mon` → `attitude_error_mon` |
+| Weekly ACA metrics roll-up | `aca_weekly_report` → `aca_weekly_report` |
+| Month/quarter/semester boundaries for a report | `ska_report_ranges` (a real library: `in_month`, `get_update_ranges`, `timerange`) |
+
+Requires the **`ska3-aca`** environment — none of these are in `ska3-flight`.
+
 ## Going deeper
 
 - **[ska-packages](../ska-packages/SKILL.md)** — per-package detail: what each is for,
