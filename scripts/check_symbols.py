@@ -91,6 +91,72 @@ CONSOLE_SCRIPTS_ACA = [
 ]
 
 
+# Phase 3 domain claims: numeric/behavioural facts asserted in chandra-domain/references.
+# These are the things that silently rot if a convention or default changes.
+def check_domain_facts():
+    """Assert the concrete numbers stated in the chandra-domain reference files."""
+    import inspect
+
+    from cxotime import CxoTime
+    from Quaternion import Quat
+
+    from chandra_aca import transform as tr
+
+    fails = []
+
+    def chk(label, cond, detail=""):
+        print(f"  {'ok  ' if cond else 'FAIL'} {label}{'  ' + detail if detail else ''}")
+        if not cond:
+            fails.append(label)
+
+    # time-systems.md
+    chk("CxoTime(0).date == 1997:365:23:58:56.816",
+        CxoTime(0).date == "1997:365:23:58:56.816", CxoTime(0).date)
+    chk("1998:001 UTC == 63.184 secs",
+        abs(CxoTime("1998:001:00:00:00").secs - 63.184) < 1e-3)
+    chk("secs == cxcsec", CxoTime("2026:001").secs == CxoTime("2026:001").cxcsec)
+    chk("bare number -> 'secs' format", CxoTime(0).format == "secs")
+    chk("YYYY:DOY string -> 'date' format", CxoTime("2026:001").format == "date")
+    chk("default scale is utc", CxoTime("2026:001").scale == "utc")
+    for fmt in ["date", "secs", "greta", "maude", "frac_year"]:
+        chk(f"format '{fmt}' registered", fmt in CxoTime.FORMATS)
+
+    # coordinates-and-frames.md
+    sig = inspect.signature(tr.pixels_to_yagzag)
+    chk("pixels_to_yagzag t_aca default == 35.0",
+        sig.parameters["t_aca"].default == 35.0, str(sig.parameters["t_aca"].default))
+    chk("pixels_to_yagzag pix_zero_loc default == 'edge'",
+        sig.parameters["pix_zero_loc"].default == "edge")
+    chk("pix_zero_loc is keyword-only",
+        sig.parameters["pix_zero_loc"].kind is inspect.Parameter.KEYWORD_ONLY)
+
+    y_e, z_e = tr.pixels_to_yagzag(100.0, 100.0, pix_zero_loc="edge")
+    y_c, z_c = tr.pixels_to_yagzag(100.0, 100.0, pix_zero_loc="center")
+    shift = max(abs(y_c - y_e), abs(z_c - z_e))
+    chk("pix_zero_loc shift ~= 2.49 arcsec", 2.3 < shift < 2.7, f"{shift:.3f}")
+
+    y0, _ = tr.pixels_to_yagzag(0.0, 0.0)
+    y1, _ = tr.pixels_to_yagzag(1.0, 0.0)
+    chk("1 ACA pixel ~= 5 arcsec", 4.8 < abs(y1 - y0) < 5.2, f"{abs(y1 - y0):.3f}")
+
+    q0 = Quat(equatorial=[0.0, 0.0, 0.0])
+    yag, _ = tr.radec_to_yagzag(1.0, 0.0, q0)
+    chk("yag/zag are arcsec (1 deg -> 3600)", abs(yag - 3600.0) < 1.0, f"{yag:.1f}")
+
+    chk("Quat.q is [x,y,z,w] with scalar last",
+        list(Quat([0.0, 0.0, 0.0, 1.0]).equatorial) == [0.0, 0.0, 0.0])
+    chk("Quat.transform is 3x3", Quat(equatorial=[1, 2, 3]).transform.shape == (3, 3))
+
+    # computed MSIDs are lowercase-only
+    from cheta import fetch
+
+    good, bad = fetch.msid_glob("quat_aoattqt")
+    chk("comp 'quat_aoattqt' resolves", good == ["quat_aoattqt"])
+    chk("comp uppercase 'QUAT_AOATTQT' is rejected", bad == ["QUAT_AOATTQT"], str(bad))
+
+    return fails
+
+
 def main():
     print(f"python  : {sys.executable}")
     ok, bad, noimport = [], [], []
@@ -116,6 +182,11 @@ def main():
         print(f"\n== IMPORT FAILED ({len(noimport)}) ==")
         for m, a, e in noimport:
             print(f"  {m}.{a}  -> {e}")
+
+    print("\n== domain facts (chandra-domain references) ==")
+    domain_fails = check_domain_facts()
+    if domain_fails:
+        bad.extend(("domain", f) for f in domain_fails)
 
     # Version-gated symbols: present only at/above a stated package version
     from packaging.version import Version

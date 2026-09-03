@@ -89,9 +89,9 @@ re-documenting it adds little and can crowd out better answers. See
 | Priority | Area | State |
 |---|---|---|
 | — | Plugin scaffolding, router index | Done — 51 entries, verified against `ska3-flight` 2026.9 |
-| 1 | `ska-data-access` — `$SKA`, envs, data sources, offsite | Next |
-| 2 | Undocumented `ska3-aca` packages (jobwatch, fss_check, aca_hi_bgd, kalman_watch, …) | Planned |
-| 3 | `chandra-domain` — frames, time systems, hardware | Planned |
+| 1 | `ska-data-access` — `$SKA`, envs, data sources, offsite | **Done** |
+| 2 | `ska3-aca` monitors, documented as a family | **Done** — they are applications, not importable libraries |
+| 3 | `chandra-domain` — frames, time systems | **Done** (frames + time; hardware/mission still open) |
 | 4 | Mainstream package gotchas (cheta, kadi, mica, proseco) — gotchas only | Planned |
 | 5 | Eval harness (`claude plugin eval`) + repo rollout | Planned |
 
