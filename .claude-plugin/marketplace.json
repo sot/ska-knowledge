@@ -1,5 +1,5 @@
 {
-  "name": "ska",
+  "name": "sot",
   "description": "Chandra X-ray Observatory and Ska3 knowledge for the SOT/ACA team: routing across the ~90 ska3-flight packages, spacecraft and ACA domain background, and data access guidance.",
   "owner": {
     "name": "Chandra SOT / ACA team",

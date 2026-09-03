@@ -16,30 +16,32 @@ Two audiences, one set of files:
 
 ```
 /plugin marketplace add sot/ska-knowledge
-/plugin install ska@ska
+/plugin install ska@sot
 ```
 
 ### Getting updates — read this, it is not obvious
 
 Installing **copies** this repo into a snapshot under
-`~/.claude/plugins/cache/ska/ska/<version>/`. That snapshot, not the repo, is what Claude
-loads. So a `git pull` (or, for a local checkout, editing the files) changes **nothing**
+`~/.claude/plugins/cache/sot/ska/<commit-sha>/`. That snapshot, not the repo, is what
+Claude loads. `plugin.json` carries no `version`, so the version *is* the commit SHA —
+each commit gets its own cache directory, and merging to master is the whole release
+process. So a `git pull` (or, for a local checkout, editing the files) changes **nothing**
 until you refresh the snapshot, and there are two different update commands:
 
 ```
-/plugin marketplace update ska    # refreshes the marketplace INDEX only - not the content
-/plugin update ska@ska            # re-copies the plugin content  <-- the one you need
+/plugin marketplace update sot    # refreshes the marketplace INDEX only - not the content
+/plugin update ska@sot            # re-copies the plugin content  <-- the one you need
 ```
 
 Then **restart Claude Code** — the update command itself says "Restart to apply changes."
 
-Turn on auto-update for the `ska` marketplace in `/plugin` as well; third-party
+Turn on auto-update for the `sot` marketplace in `/plugin` as well; third-party
 marketplaces do not auto-update by default, so without it your copy silently goes stale.
 
 Verify which content is actually live:
 
 ```bash
-diff -r ~/.claude/plugins/cache/ska/ska/*/skills ./skills
+diff -r ~/.claude/plugins/cache/sot/ska/*/skills ./skills
 ```
 
 ### For a whole repo
@@ -50,9 +52,9 @@ the standard one-time folder-trust prompt, with no manual install:
 ```json
 {
   "extraKnownMarketplaces": {
-    "ska": { "source": { "source": "github", "repo": "sot/ska-knowledge" } }
+    "sot": { "source": { "source": "github", "repo": "sot/ska-knowledge" } }
   },
-  "enabledPlugins": { "ska@ska": true }
+  "enabledPlugins": { "ska@sot": true }
 }
 ```
 

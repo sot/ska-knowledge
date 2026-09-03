@@ -116,11 +116,11 @@ Add your new claims to `CLAIMS` in that script. Code snippets should be runnable
 - **Release time** — review routing against the release's package changes.
 
 **Editing does not take effect until you refresh the snapshot.** Installing copies this
-repo into `~/.claude/plugins/cache/ska/ska/<version>/`, and that copy is what Claude
+repo into `~/.claude/plugins/cache/sot/ska/<commit-sha>/`, and that copy is what Claude
 loads. After any edit:
 
 ```
-claude plugin update ska@ska    # re-copy content (NOT `marketplace update`, which only
+claude plugin update ska@sot    # re-copy content (NOT `marketplace update`, which only
                                #  refreshes the index)
 ```
 
