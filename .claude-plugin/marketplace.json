@@ -1,0 +1,15 @@
+{
+  "name": "ska",
+  "description": "Chandra X-ray Observatory and Ska3 knowledge for the SOT/ACA team: routing across the ~90 ska3-flight packages, spacecraft and ACA domain background, and data access guidance.",
+  "owner": {
+    "name": "Chandra SOT / ACA team",
+    "url": "https://github.com/sot"
+  },
+  "plugins": [
+    {
+      "name": "ska",
+      "source": "./",
+      "description": "Chandra X-ray Observatory and Ska3 Python ecosystem: which package and function to reach for, spacecraft and ACA domain background, and how to get at the data."
+    }
+  ]
+}

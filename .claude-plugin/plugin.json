@@ -1,0 +1,10 @@
+{
+  "name": "ska",
+  "description": "Chandra X-ray Observatory and Ska3 Python ecosystem: which package and function to reach for, spacecraft and ACA domain background, and how to get at the data.",
+  "author": {
+    "name": "Chandra SOT / ACA team"
+  },
+  "homepage": "https://github.com/sot/ska-knowledge",
+  "repository": "https://github.com/sot/ska-knowledge",
+  "license": "BSD-3-Clause"
+}
