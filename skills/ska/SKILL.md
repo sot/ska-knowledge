@@ -58,6 +58,7 @@ columns. Convert at the edge with `tbl.to_pandas()` if you need pandas.
 | Dark current calibration image | `mica.archive.aca_dark.get_dark_cal_props` |
 | Acquisition / guide success probabilities | `chandra_aca.star_probs.acq_success_prob` |
 | ACA alignment drift vs. time, aimpoint offsets | `chandra_aca.drift.get_aca_offsets` |
+| Convert image DN to electrons | multiply by **5** — `IMG` (DN) = `IMGTLM * IMGSCALE/32 - 50`, and 1 DN ≈ 5 e⁻ ([aca-hardware](../chandra-domain/references/aca-hardware.md)) |
 
 ### Coordinates, time, attitude
 

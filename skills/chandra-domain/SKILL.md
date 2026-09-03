@@ -15,8 +15,10 @@ the [ska router](../ska/SKILL.md).
 |---|---|
 | [coordinates-and-frames.md](references/coordinates-and-frames.md) | The `row/col ↔ yag/zag ↔ RA/Dec` chain, units at each step, `pix_zero_loc` and `t_aca`, quaternion component order, the three image row/col origins |
 | [time-systems.md](references/time-systems.md) | `CxoTime`, the five Chandra-specific formats, CXC seconds and the TT epoch offset, input-guessing rules |
+| [aca-hardware.md](references/aca-hardware.md) | Optics and CCD, the ACA coordinate system, image slots and 4×4 / modified 6×6 / 8×8 readouts, readout cadence, pixel encoding (DN ↔ electrons), how `BGDAVG` is computed, where the status columns come from |
+| [aspect-performance.md](references/aspect-performance.md) | ACA magnitude and its limits, acquisition/tracking success, accuracy requirements vs actuals, dither defaults, gyro-hold drift, operational constraints, CCD ageing |
 
-## The four things most likely to be silently wrong
+## Most likely to be silently wrong
 
 1. **Quaternion component order is `[x, y, z, w]` — scalar last.** Much of the literature
    and many libraries put the scalar first. Feeding `[w, x, y, z]` gives a wrong attitude
@@ -28,6 +30,13 @@ the [ska router](../ska/SKILL.md).
 4. **`t_aca`'s default changed** (20 → 35.0 degC in `chandra_aca` 4.55.0), as did
    `allow_bad` (False → True) and whether the args are keyword-only. Pass `t_aca`
    explicitly; never inherit it.
+5. **A "modified 6×6" readout telemeters 32 pixels, not 36.** The four corners are
+   absent — that is the mouse-bitten corner, and the reason every image comes back as a
+   masked 8×8.
+6. **An 8×8 image takes 4 telemetry updates**, and the last 16 pixels *repeat* until the
+   next CCD readout. Consecutive samples are not independent readouts.
+7. **`BGDAVG` is a robust average of 8 corner pixels**, not a whole-image mean, so it
+   cannot track a gradient across the image.
 
 ## Units cheat sheet
 
@@ -37,14 +46,13 @@ the [ska router](../ska/SKILL.md).
 | yag / zag | arcseconds |
 | RA / Dec / roll | degrees |
 | `secs` / `cxcsec` | seconds since 1998-01-01 00:00:00 **TT** |
-| ACA image `IMG` | DN (data numbers) |
+| ACA image `IMG` | DN (data numbers); **1 DN ≈ 5 electrons** |
 | CCD temperature | degC in `chandra_aca` transforms; K in some cheta paths |
 
 ## Not yet written
 
-Mission and orbit, spacecraft subsystems, ACA hardware (optics, CCD, readout modes,
-slots, dark current), star catalogs and ACA magnitudes, observations and dwells, mission
-planning and load products, and a glossary.
+Mission and orbit, spacecraft subsystems beyond the ACA, observations and dwells,
+mission planning and load products, and a glossary.
 
 Until those exist, the public authority for the observatory itself is the Chandra
 Proposers' Observatory Guide (https://cxc.harvard.edu/proposer/POG/), and the team's own
