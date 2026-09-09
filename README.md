@@ -78,6 +78,7 @@ neither, and would need maintaining across ~90 repos.
 | [ska-packages](skills/ska-packages/SKILL.md) | Per-package detail, snippets, gotchas |
 | [chandra-domain](skills/chandra-domain/SKILL.md) | How the observatory and the ACA work |
 | [ska-data-access](skills/ska-data-access/SKILL.md) | `$SKA`, environments, which archive to use |
+| [ska-coding-style](skills/ska-coding-style/SKILL.md) | Team conventions for writing the code itself |
 
 ## Status
 
@@ -92,8 +93,9 @@ re-documenting it adds little and can crowd out better answers. See
 | 1 | `ska-data-access` — `$SKA`, envs, data sources, offsite | **Done** |
 | 2 | `ska3-aca` monitors, documented as a family | **Done** — they are applications, not importable libraries |
 | 3 | `chandra-domain` — frames, time systems | **Done** (frames + time; hardware/mission still open) |
-| 4 | Mainstream package gotchas (cheta, kadi, mica, proseco) — gotchas only | Planned |
-| 5 | Eval harness (`claude plugin eval`) + repo rollout | Planned |
+| 4 | `ska-coding-style` — team conventions, from `skanb` notebooks + self-code-review | **Done** |
+| 5 | Mainstream package gotchas (cheta, kadi, mica, proseco) — gotchas only | Planned |
+| 6 | Eval harness (`claude plugin eval`) + repo rollout | Planned |
 
 `chandra_aca` reference is written and is the model for the rest.
 

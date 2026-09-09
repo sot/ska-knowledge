@@ -54,6 +54,16 @@ CLAIMS = [
     ("ska_helpers.chandra_models", "get_data"),
     ("chandra_maneuver", "duration"),
     ("parse_cm.backstop", "read_backstop"),
+    # ska-coding-style
+    ("cheta.fetch", "Msid"),
+    ("cheta.fetch_eng", "Msid"),
+    ("cheta.utils", "logical_intervals"),
+    ("ska_matplotlib", "plot_cxctime"),
+    ("ska_matplotlib", "cxctime2plotdate"),
+    ("cxotime", "date2secs"),
+    ("cxotime", "secs2date"),
+    ("cxotime", "CxoTimeLike"),
+    ("astropy.table", "vstack"),
 ]
 
 # ska3-aca only: the monitor/trending family. Skipped unless running in ska3-aca.

@@ -42,7 +42,9 @@ legacy; new code is all lowercase with underscores.
 **Tables are astropy `Table`, never pandas `DataFrame`.** All Ska flight packages use
 astropy `Table` for consistency, and it supports things `DataFrame` cannot: multi-dimensional
 column data (e.g. an 8x8 ACA image per row), column and table metadata, and `CxoTime`
-columns. Convert at the edge with `tbl.to_pandas()` if you need pandas.
+columns. Convert at the edge with `tbl.to_pandas()` if you need pandas. More conventions of this
+kind — the ones no package doc states — are in
+[ska-coding-style](../ska-coding-style/SKILL.md).
 
 ## I want to…
 
@@ -163,6 +165,9 @@ Requires the **`ska3-aca`** environment — none of these are in `ska3-flight`.
   frames, time systems, star catalogs, mission planning cadence, glossary.
 - **[ska-data-access](../ska-data-access/SKILL.md)** — `$SKA`, the `ska3-*` environments,
   which data source to use, and what works offsite vs. only on HEAD/GRETA.
+- **[ska-coding-style](../ska-coding-style/SKILL.md)** — how the team actually writes this
+  code: import aliases, `plot_cxctime` over `datetime64`, `ok` masks, `logical_intervals`,
+  and the self-code-review checklist. Read it before writing Ska code, not after.
 
 ## Upstream documentation
 
