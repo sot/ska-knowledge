@@ -97,6 +97,17 @@ re-documenting it adds little and can crowd out better answers. See
 
 `chandra_aca` reference is written and is the model for the rest.
 
+## How this was built
+
+[docs/building-a-knowledge-base.md](docs/building-a-knowledge-base.md) is an annotated
+export of the session that produced this repo: the concepts (skills, plugins,
+marketplaces, the plugin cache), every prompt in order with what it accomplished, the
+mistakes worth skipping, and a recommended order for building an equivalent knowledge base
+for a different codebase.
+
+Useful if you are standing up a knowledge base for your own code infrastructure rather
+than consuming this one.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). The short version: if the routing sent you to the
