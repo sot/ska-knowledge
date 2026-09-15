@@ -78,6 +78,36 @@ after the next CCD readout."* So consecutive telemetry samples of an 8×8 image 
 independent readouts, and repeated identical pixel blocks are expected behaviour, not a
 glitch.
 
+### Centroids arrive at 1.025 s but only refresh every 2.05 s
+
+The same repeat-when-stale behaviour applies to the **centroids and magnitudes**, and this
+is the version that most often gets mistaken for real data:
+
+- On-board **integration time is 1.696 s** (`ACA<slot>_INTEG` in the ACA image telemetry,
+  or `AOACINTT` in PCAD telemetry as a raw word in milliseconds, 1697.66 ms).
+- Integration plus readout means fresh data are available only once every **2.05 s**.
+- The ACA is nonetheless **required to supply centroid data every 1.025 s**, so when no new
+  readout is ready it **repeats the previous values and sets a stale/repeat flag**.
+
+That flag is **`AOACRPT`** ("ACA DATA: REPEAT FLAG"), sampled at 1.025 s alongside the
+centroids. In normal operation it alternates 1/0/1/0 with a duty cycle of exactly 0.5.
+
+So `AOACYAN<slot>` / `AOACZAN<slot>` / `AOACMAG<slot>` come at 1.025 s but carry only
+**half that many independent measurements**. Verified over a 30-minute stretch of obsid
+27589 while tracking: `AOACRPT == 1` meant the centroid was byte-identical to the previous
+sample in 807 of 807 cases, and `AOACRPT == 0` meant it changed in 800 of 805 (the five
+exceptions are fresh readouts that landed on the same quantised value).
+
+Consequences worth keeping in mind:
+
+- Any scatter, standard deviation or PSD computed over raw 1.025 s centroid samples is
+  working with a series where **every other point is a duplicate**. That deflates the
+  apparent sample noise and puts a spurious feature at the 2.05 s period.
+- Sample counts overstate the real integration count by 2x. An N-sample dropout costs
+  N/2 actual centroid updates.
+- To get independent measurements, select `AOACRPT == 0` (or take every other sample from
+  a known phase).
+
 ## Pixel encoding: from telemetry counts to DN to electrons
 
 Each pixel is a **10-bit** signal (0–1023) plus a per-image **scale factor**:

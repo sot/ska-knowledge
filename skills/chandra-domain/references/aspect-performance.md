@@ -36,6 +36,53 @@ Recent acquisition and tracking success (2024-Oct → 2025-Oct):
 The steep acquisition falloff at the faint end — 92 % overall vs 61 % by 10.0–10.3 — is why
 `chandra_aca.star_probs.acq_success_prob` exists rather than a simple magnitude cut.
 
+### The track / search cycle on a marginal star
+
+Tracking success in that table is per-observation, not per-sample. A near-limit star that
+counts as "tracked" can still drop out repeatedly *within* the dwell, and it does so in a
+very regular pattern that is easy to mistake for noise or for a processing artefact.
+
+`AOACFCT<slot>` moves through fixed-length runs, quantised in **telemetry samples** of
+1.025 s (and hence in 2.05 s integrations, see
+[aca-hardware.md](aca-hardware.md)):
+
+| Run | Samples | Duration | Meaning |
+|---|---|---|---|
+| `SRCH` | 8 | 8.2 s | search, then reacquire |
+| `SRCH` | 4 | 4.1 s | search leading into a `NONE` |
+| `NONE` | 8 | 8.2 s | no star found |
+| `RACQ` | ~100+ | ~2 min | full reacquisition sequence |
+
+The two shapes seen in flight:
+
+- **Short dropout** — exactly `SRCH x8` (8.2 s) and straight back to `TRAK`. The star is
+  usually held for only ~8.2 s before the next one, giving a **16.4 s square wave** of
+  alternating track and no-track.
+- **Sustained dropout** — a repeating `SRCH x4 + NONE x8` unit (12.3 s), N times, closed
+  out by a final `SRCH x8` before `TRAK` resumes. Longer ones are dominated by `RACQ`.
+
+While in these states the centroid telemetry reads its bad-data values: `AOACYAN` /
+`AOACZAN` = **-3276.8**, `AOACMAG` = **13.94**, `AOIMAGE` = `NULL`. Note that
+`aca<slot>_imgrow0` keeps reporting a frozen window throughout, so an image-row plot hides
+the dropout entirely.
+
+Measured on obsid 27589 (2022:343) slot 6, `m_ACA` = 10.21 and by far the faintest of the
+five guide stars: 63 dropouts totalling 2381 s of a 16175 s dwell, of which 40 were exactly
+`SRCH x8` — 40 of 40 with no variation. A 2013 interval on another marginal slot-6 star
+gave 21 of 21. Across the whole observation `SRCH` runs were 4 or 8 samples in 136 of 137
+cases. So the quantisation is a property of the flight software, not of one observation.
+
+Two traps this creates:
+
+- At a full-dwell plot scale one 16.4 s cycle is under a pixel wide, so shaded dropout
+  intervals and good tracking data land on the same pixel column and appear to overlap.
+  Zoom before concluding anything about alignment.
+- `AOACIMS` (multiple stars) is often set during the `TRAK` stretches of such a star (72 %
+  of samples in the short runs for obsid 27589) **with no AGASC neighbour anywhere near** —
+  the nearest catalogue star inside 72 arcsec was the target itself. Near the faint limit
+  the flag reflects noise, warm pixels or radiation events in the search box, so it is not
+  by itself evidence of a real spoiler.
+
 ## Accuracy — requirement vs actual
 
 | Quantity | Requirement | Actual |

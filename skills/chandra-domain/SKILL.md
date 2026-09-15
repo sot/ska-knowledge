@@ -15,8 +15,8 @@ the [ska router](../ska/SKILL.md).
 |---|---|
 | [coordinates-and-frames.md](references/coordinates-and-frames.md) | The `row/col ↔ yag/zag ↔ RA/Dec` chain, units at each step, `pix_zero_loc` and `t_aca`, quaternion component order, the three image row/col origins |
 | [time-systems.md](references/time-systems.md) | `CxoTime`, the five Chandra-specific formats, CXC seconds and the TT epoch offset, input-guessing rules |
-| [aca-hardware.md](references/aca-hardware.md) | Optics and CCD, the ACA coordinate system, image slots and 4×4 / modified 6×6 / 8×8 readouts, readout cadence, pixel encoding (DN ↔ electrons), how `BGDAVG` is computed, where the status columns come from |
-| [aspect-performance.md](references/aspect-performance.md) | ACA magnitude and its limits, acquisition/tracking success, accuracy requirements vs actuals, dither defaults, gyro-hold drift, operational constraints, CCD ageing |
+| [aca-hardware.md](references/aca-hardware.md) | Optics and CCD, the ACA coordinate system, image slots and 4×4 / modified 6×6 / 8×8 readouts, readout and centroid cadence (`AOACRPT`), pixel encoding (DN ↔ electrons), how `BGDAVG` is computed, where the status columns come from |
+| [aspect-performance.md](references/aspect-performance.md) | ACA magnitude and its limits, acquisition/tracking success, the track/search dropout cycle on a marginal star, accuracy requirements vs actuals, dither defaults, gyro-hold drift, operational constraints, CCD ageing |
 
 ## Most likely to be silently wrong
 
@@ -35,7 +35,11 @@ the [ska router](../ska/SKILL.md).
    masked 8×8.
 6. **An 8×8 image takes 4 telemetry updates**, and the last 16 pixels *repeat* until the
    next CCD readout. Consecutive samples are not independent readouts.
-7. **`BGDAVG` is a robust average of 8 corner pixels**, not a whole-image mean, so it
+7. **Centroids are telemetered every 1.025 s but only refresh every 2.05 s.** Integration
+   time is 1.696 s, so the ACA repeats the previous `AOACYAN`/`AOACZAN`/`AOACMAG` values
+   and flags it with `AOACRPT` to meet its 1.025 s delivery requirement. Half of every
+   raw centroid series is duplicated samples; select `AOACRPT == 0` for independent ones.
+8. **`BGDAVG` is a robust average of 8 corner pixels**, not a whole-image mean, so it
    cannot track a gradient across the image.
 
 ## Units cheat sheet
