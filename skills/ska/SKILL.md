@@ -168,6 +168,9 @@ Requires the **`ska3-aca`** environment — none of these are in `ska3-flight`.
 - **[ska-coding-style](../ska-coding-style/SKILL.md)** — how the team actually writes this
   code: import aliases, `plot_cxctime` over `datetime64`, `ok` masks, `logical_intervals`,
   and the self-code-review checklist. Read it before writing Ska code, not after.
+- **[ska-pull-requests](../ska-pull-requests/SKILL.md)** — writing a PR description against
+  the shared `sot` template, and the `git rev-parse HEAD` + `pytest` transcript the Unit
+  tests section expects as evidence.
 
 ## Upstream documentation
 

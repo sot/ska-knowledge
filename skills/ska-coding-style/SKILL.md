@@ -190,3 +190,6 @@ mask-then-column, ternary. It is short and it is the checklist reviewers actuall
 
 For notebook-specific conventions (header cell, `%matplotlib inline`, trailing semicolons)
 see [references/analysis-notebooks.md](references/analysis-notebooks.md).
+
+When the code is ready to propose, [ska-pull-requests](../ska-pull-requests/SKILL.md) covers
+the PR description itself — the `sot` template and the pytest transcript it expects.

@@ -104,3 +104,5 @@ value = (
 
 - [../SKILL.md](../SKILL.md) — the Ska-specific conventions these sit on top of.
 - [analysis-notebooks.md](analysis-notebooks.md) — where the checklist relaxes.
+- [../../ska-pull-requests/SKILL.md](../../ska-pull-requests/SKILL.md) — the next step: the
+  PR description these checks are expected to have preceded.

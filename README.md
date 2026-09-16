@@ -63,7 +63,7 @@ $(find ~/.vscode/extensions -maxdepth 4 -path '*native-binary/claude' | sort | t
 ```
 
 Then reload/restart so the skills load, and confirm by asking Claude "list your available
-skills" — you should see four `ska:*` entries.
+skills" — you should see six `ska:*` entries.
 
 Installing at **user scope** (the default) is deliberate and is the recommended path. It
 covers bare analysis directories and notebooks, not just package repos — which is where a
@@ -79,6 +79,7 @@ neither, and would need maintaining across ~90 repos.
 | [chandra-domain](skills/chandra-domain/SKILL.md) | How the observatory and the ACA work |
 | [ska-data-access](skills/ska-data-access/SKILL.md) | `$SKA`, environments, which archive to use |
 | [ska-coding-style](skills/ska-coding-style/SKILL.md) | Team conventions for writing the code itself |
+| [ska-pull-requests](skills/ska-pull-requests/SKILL.md) | Writing a PR description against the `sot` template |
 
 ## Status
 
@@ -94,6 +95,7 @@ re-documenting it adds little and can crowd out better answers. See
 | 2 | `ska3-aca` monitors, documented as a family | **Done** — they are applications, not importable libraries |
 | 3 | `chandra-domain` — frames, time systems | **Done** (frames + time; hardware/mission still open) |
 | 4 | `ska-coding-style` — team conventions, from `skanb` notebooks + self-code-review | **Done** |
+| 4 | `ska-pull-requests` — the `sot` PR template and its pytest-transcript convention | **Done** |
 | 5 | Mainstream package gotchas (cheta, kadi, mica, proseco) — gotchas only | Planned |
 | 6 | Eval harness (`claude plugin eval`) + repo rollout | Planned |
 
