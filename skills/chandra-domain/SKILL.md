@@ -1,6 +1,6 @@
 ---
 name: chandra-domain
-description: Chandra X-ray Observatory spacecraft and ACA domain background - coordinate frames and units (CCD row/col, yag/zag arcsec, RA/Dec degrees), quaternion conventions, Chandra time systems and CXC seconds, mission and orbit, aspect camera hardware, observations and dwells, mission planning and load products. Use when the question is about how the observatory works or what a convention means, rather than which function to call.
+description: Chandra X-ray Observatory spacecraft and ACA domain background - coordinate frames and units (CCD row/col, yag/zag arcsec, RA/Dec degrees), quaternion conventions, Chandra time systems and CXC seconds, mission and orbit, aspect camera hardware, observations and dwells, as-run vs scheduled ObsID and undercover (cold ECS blank sky) observations, mission planning and load products. Use when the question is about how the observatory works or what a convention means, rather than which function to call.
 ---
 
 # Chandra domain background
@@ -16,6 +16,7 @@ the [ska router](../ska/SKILL.md).
 | [coordinates-and-frames.md](references/coordinates-and-frames.md) | The `row/col ↔ yag/zag ↔ RA/Dec` chain, units at each step, `pix_zero_loc` and `t_aca`, quaternion component order, the three image row/col origins |
 | [time-systems.md](references/time-systems.md) | `CxoTime`, the five Chandra-specific formats, CXC seconds and the TT epoch offset, input-guessing rules |
 | [aca-hardware.md](references/aca-hardware.md) | Optics and CCD, the ACA coordinate system, image slots and 4×4 / modified 6×6 / 8×8 readouts, readout and centroid cadence (`AOACRPT`), pixel encoding (DN ↔ electrons), how `BGDAVG` is computed, where the status columns come from |
+| [obsids-and-undercovers.md](references/obsids-and-undercovers.md) | As-run `obsid` vs scheduled `obsid_sched`, the OR/ER split at 38000, undercover (cold ECS blank sky) observations and how to spot one, obsid behavior after SCS-107 and safe mode |
 | [aspect-performance.md](references/aspect-performance.md) | ACA magnitude and its limits, acquisition/tracking success, the track/search dropout cycle on a marginal star, accuracy requirements vs actuals, dither defaults, gyro-hold drift, operational constraints, CCD ageing |
 
 ## Most likely to be silently wrong
@@ -41,6 +42,10 @@ the [ska router](../ska/SKILL.md).
    raw centroid series is duplicated samples; select `AOACRPT == 0` for independent ones.
 8. **`BGDAVG` is a robust average of 8 corner pixels**, not a whole-image mean, so it
    cannot track a gradient across the image.
+9. **An observation has two ObsIDs.** `obsid` is as-run, `obsid_sched` is what the
+   schedule said; they differ for ~3% of observations, in blocks after SCS-107 and
+   singly for undercovers. `obsid_sched` needs `kadi` >= 7.19.0 and is absent from
+   the returned dict for pre-APR1420B loads.
 
 ## Units cheat sheet
 
@@ -55,8 +60,8 @@ the [ska router](../ska/SKILL.md).
 
 ## Not yet written
 
-Mission and orbit, spacecraft subsystems beyond the ACA, observations and dwells,
-mission planning and load products, and a glossary.
+Mission and orbit, spacecraft subsystems beyond the ACA, dwells and maneuvers,
+mission planning and load products beyond the ObsID story, and a glossary.
 
 Until those exist, the public authority for the observatory itself is the Chandra
 Proposers' Observatory Guide (https://cxc.harvard.edu/proposer/POG/), and the team's own

@@ -94,6 +94,11 @@ CLAIMS_VERSION_GATED = [
     ("chandra_aca", "4.56.0", "chandra_aca.aca_image", "get_aca_images_cheta"),
 ]
 
+# obsid_sched landed in kadi 7.19.0; ska3-aca 2026.11 ships 7.18.1 without it. This is a
+# dict key rather than a module attribute, so it needs its own check (check_obsid_facts).
+KADI_OBSID_SCHED_MINVER = "7.19.0"
+KADI_MERGE_SPLITS_MINVER = "7.20.0"
+
 CONSOLE_SCRIPTS_ACA = [
     "skawatch_daily", "skawatch_hourly", "fss_check_daily_fss", "aca_hi_bgd_update",
     "kalman_watch_low_kalman_mon", "kalman_watch_kalman_perigee_mon",
@@ -185,6 +190,105 @@ def check_domain_facts():
     return fails
 
 
+def check_obsid_facts():
+    """Assert the obsids-and-undercovers.md claims against the commands archive.
+
+    Needs the kadi commands archive, so this is skipped (not failed) if it is unavailable.
+    """
+    import kadi
+    import kadi.commands as kc
+    from packaging.version import Version
+
+    fails = []
+
+    def chk(label, cond, detail=""):
+        print(f"  {'ok  ' if cond else 'FAIL'} {label}{'  ' + detail if detail else ''}")
+        if not cond:
+            fails.append(label)
+
+    have_sched = Version(kadi.__version__) >= Version(KADI_OBSID_SCHED_MINVER)
+    have_merge = Version(kadi.__version__) >= Version(KADI_MERGE_SPLITS_MINVER)
+    chk(f"kadi {kadi.__version__}: obsid_sched expected == {have_sched}", True)
+    chk(f"conf.merge_manual_obsid_change_obs_splits present == {have_merge}",
+        hasattr(kc.conf, "merge_manual_obsid_change_obs_splits") == have_merge)
+    if have_merge:
+        chk("conf.merge_manual_obsid_change_obs_splits defaults True",
+            kc.conf.merge_manual_obsid_change_obs_splits is True)
+
+    try:
+        import razl.observations as ro
+    except ImportError:
+        print("  skip razl.observations not installed (OR/ER split)")
+    else:
+        chk("razl is_OR/is_ER split at 38000",
+            ro.is_OR(38000) and not ro.is_OR(38001) and ro.is_ER(38001))
+
+    if not have_sched:
+        # The obsid_sched= filter kwarg does not exist either, and is a hard TypeError
+        # rather than an ignored kwarg -- so calling code fails loudly, not silently.
+        try:
+            kc.get_observations(obsid_sched=24882)
+        except TypeError:
+            chk("pre-7.19.0 kadi: obsid_sched= kwarg raises TypeError", True)
+        else:
+            chk("pre-7.19.0 kadi: obsid_sched= kwarg raises TypeError", False)
+        return fails
+
+    try:
+        # The DEC2820A undercover: science obsid 24882 runs a 130 s stub, then COAOSQID
+        # switches to ER 62647 for the rest of the dwell, same star catalog.
+        obss = kc.get_observations(obsid_sched=24882)
+    except Exception as err:  # noqa: BLE001
+        print(f"  skip commands archive unavailable: {type(err).__name__}: {err}")
+        return fails
+
+    chk("undercover 24882 -> two OBS records", len(obss) == 2, str(len(obss)))
+    if len(obss) == 2:
+        sci, under = obss
+        chk("undercover: as-run obsid is ER 62647", under["obsid"] == 62647,
+            str(under["obsid"]))
+        chk("undercover: obsid_sched stays the science obsid",
+            under["obsid_sched"] == 24882 and sci["obsid"] == sci["obsid_sched"] == 24882)
+        chk("undercover: both halves share one star catalog",
+            sci["starcat_date"] == under["starcat_date"])
+        chk("undercover: SIM parked at -99616",
+            sci["simpos"] == under["simpos"] == -99616)
+        chk("undercover: split is seamless in time",
+            sci["obs_stop"] == under["obs_start"])
+        chk("undercover: scheduled in the load, not CMD_EVT",
+            under["source"] == "DEC2820A", under["source"])
+
+        # obsid_sched on the split record is NOT the latest OBSID_SCH: the load re-issues
+        # OBSID_SCH to the ER too, and the split inherits the dwell-start value.
+        cmds = kc.get_cmds(start="2020:366:17:00:00", stop="2020:366:17:20:00")
+        ids = [
+            (cmd["tlmsid"], cmd["params"]["id"])
+            for cmd in cmds
+            if cmd["tlmsid"] in ("OBSID_SCH", "COAOSQID")
+        ]
+        chk("undercover: load re-issues OBSID_SCH to the ER as well",
+            ("OBSID_SCH", 62647) in ids and ("COAOSQID", 62647) in ids, str(ids))
+        chk("undercover: obsid_sched is inherited, not the latest OBSID_SCH",
+            under["obsid_sched"] == 24882)
+
+    # The other cause: loads stopped, one as-run obsid covers many scheduled ones.
+    obss = kc.get_observations(obsid_sched=31488)
+    chk("SCS-107 case 31488 has a stopped and a re-flown record", len(obss) == 2,
+        str(len(obss)))
+    if len(obss) == 2:
+        chk("SCS-107 case: stopped run is ER 65517", obss[0]["obsid"] == 65517,
+            str(obss[0]["obsid"]))
+        chk("SCS-107 case: re-flown run matches its schedule",
+            obss[1]["obsid"] == obss[1]["obsid_sched"] == 31488)
+
+    # Pre-APR1420B loads have no obsid_sched key at all, even on current kadi.
+    obss = kc.get_observations(start="2020:001", stop="2020:060")
+    chk("pre-APR1420B observations have no obsid_sched key",
+        len(obss) > 0 and all("obsid_sched" not in obs for obs in obss))
+
+    return fails
+
+
 def main():
     print(f"python  : {sys.executable}")
     ok, bad, noimport = [], [], []
@@ -215,6 +319,11 @@ def main():
     domain_fails = check_domain_facts()
     if domain_fails:
         bad.extend(("domain", f) for f in domain_fails)
+
+    print("\n== obsid facts (obsids-and-undercovers.md) ==")
+    obsid_fails = check_obsid_facts()
+    if obsid_fails:
+        bad.extend(("obsid", f) for f in obsid_fails)
 
     # Version-gated symbols: present only at/above a stated package version
     from packaging.version import Version
