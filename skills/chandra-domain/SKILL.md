@@ -18,6 +18,7 @@ the [ska router](../ska/SKILL.md).
 | [aca-hardware.md](references/aca-hardware.md) | Optics and CCD, the ACA coordinate system, image slots and 4×4 / modified 6×6 / 8×8 readouts, readout and centroid cadence (`AOACRPT`), pixel encoding (DN ↔ electrons), how `BGDAVG` is computed, where the status columns come from |
 | [obsids-and-undercovers.md](references/obsids-and-undercovers.md) | As-run `obsid` vs scheduled `obsid_sched`, the OR/ER split at 38000, undercover (cold ECS blank sky) observations and how to spot one, obsid behavior after SCS-107 and safe mode |
 | [aspect-performance.md](references/aspect-performance.md) | ACA magnitude and its limits, acquisition/tracking success, the track/search dropout cycle on a marginal star, accuracy requirements vs actuals, dither defaults, gyro-hold drift, operational constraints, CCD ageing |
+| [load-products.md](references/load-products.md) | OCCweb working area vs released `mpcrit1/mplogs` products (overwritten vs immutable), OCCweb layout and `kadi.occweb` fetch, the proseco pickle (float obsid keys, dark map not pickled), starcheck `obsids.json` `MP_STARCAT` fields, commanded vs proseco positions |
 
 ## Most likely to be silently wrong
 
@@ -61,7 +62,7 @@ the [ska router](../ska/SKILL.md).
 ## Not yet written
 
 Mission and orbit, spacecraft subsystems beyond the ACA, dwells and maneuvers,
-mission planning and load products beyond the ObsID story, and a glossary.
+the mission planning process and cadence, and a glossary.
 
 Until those exist, the public authority for the observatory itself is the Chandra
 Proposers' Observatory Guide (https://cxc.harvard.edu/proposer/POG/), and the team's own
